@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Post - Foroom</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="container" id="main"></div>
+<script src="js/api.js"></script>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const postid = urlParams.get('id');
+function load() {
+  api("/posts/"+postid).then(post => {
+    document.getElementById("main").innerHTML = `
+      <h2>${post.title}</h2>
+      <p>${post.content}</p>
+      <small>by <a href="profile.html?user=${post.author}">${post.author}</a> at ${new Date(post.created_at).toLocaleString()}</small>
+      <h3>Replies</h3>
+      <div id="replies"></div>
+      <div id="replybox"></div>
+    `;
+    loadReplies();
+    showReplyBox();
+  });
+}
+function loadReplies() {
+  api(`/posts/${postid}/replies`).then(replies => {
+    document.getElementById("replies").innerHTML = replies.map(r => `
+      <div class="reply"><b>${r.author}</b>: ${r.content} <br><small>${new Date(r.created_at).toLocaleString()}</small></div>
+    `).join('');
+  });
+}
+function showReplyBox() {
+  if (!isLoggedIn()) return;
+  document.getElementById("replybox").innerHTML = `
+    <form onsubmit="return reply()">
+      <textarea id="replycontent" required></textarea><br>
+      <button type="submit">Reply</button>
+    </form>
+  `;
+}
+function reply() {
+  api(`/posts/${postid}/replies`, "POST", {content: replycontent.value}).then(() => {
+    loadReplies();
+    document.getElementById("replycontent").value = "";
+  });
+  return false;
+}
+window.onload = load;
+</script>
+</body>
+</html>

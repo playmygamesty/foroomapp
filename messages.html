@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Messages - Foroom</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="container">
+  <h2>Private Messages</h2>
+  <div id="messages"></div>
+  <div id="sendbox"></div>
+</div>
+<script src="js/api.js"></script>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const to = urlParams.get('to');
+if (!to) { document.getElementById('messages').innerText = "No user selected."; }
+else {
+  function loadMsgs() {
+    api("/messages/"+to).then(msgs => {
+      document.getElementById("messages").innerHTML = msgs.map(m => `
+        <div><b>${m.from_user}</b>: ${m.content} <small>${new Date(m.created_at).toLocaleString()}</small></div>
+      `).join('');
+    });
+  }
+  function sendMsg() {
+    api("/messages/"+to, "POST", {content: document.getElementById("msg").value}).then(() => {
+      loadMsgs();
+      document.getElementById("msg").value = "";
+    });
+    return false;
+  }
+  window.onload = () => {
+    loadMsgs();
+    document.getElementById("sendbox").innerHTML = `
+      <form onsubmit="return sendMsg()">
+        <textarea id="msg" required></textarea><br>
+        <button type="submit">Send</button>
+      </form>
+    `;
+  };
+}
+</script>
+</body>
+</html>

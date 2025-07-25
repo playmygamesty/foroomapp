@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Users - Foroom</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="container">
+  <h2>Users</h2>
+  <ul id="ulist"></ul>
+</div>
+<script src="js/api.js"></script>
+<script>
+window.onload = () => {
+  api("/users").then(users => {
+    document.getElementById("ulist").innerHTML = users.map(u =>
+      `<li><a href="profile.html?user=${u.username}">${u.username}</a></li>`
+    ).join('');
+  });
+};
+</script>
+</body>
+</html>

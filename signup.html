@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Create an Account - Foroom</title>
+  <title>Sign up – Foroom</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -20,7 +20,9 @@ function signup() {
   api("/signup", "POST", {username: username.value, password: password.value})
     .then(res => {
       if (res.token) { setToken(res.token); location.href = "index.html"; }
-      else document.getElementById("msg").innerText = "Account creation failed";
+      else if (res.ok) { document.getElementById("msg").innerText = "Account created, please log in."; }
+      else if (res.error) { document.getElementById("msg").innerText = res.error; }
+      else { document.getElementById("msg").innerText = "Account creation failed"; }
     });
   return false;
 }

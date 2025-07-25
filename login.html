@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login - Foroom</title>
+  <title>Login – Foroom</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -20,7 +20,8 @@ function login() {
   api("/login", "POST", {username: username.value, password: password.value})
     .then(res => {
       if (res.token) { setToken(res.token); location.href = "index.html"; }
-      else document.getElementById("msg").innerText = "Login failed";
+      else if (res.error) { document.getElementById("msg").innerText = res.error; }
+      else { document.getElementById("msg").innerText = "Login failed"; }
     });
   return false;
 }

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Foroom - Home</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header>
+  <h1>Foroom</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="users.html">Users</a>
+    <span id="authlinks"></span>
+  </nav>
+</header>
+<div class="container">
+  <h2>Posts</h2>
+  <div id="posts"></div>
+  <div id="newpost"></div>
+</div>
+<script src="js/api.js"></script>
+<script>
+function showPosts() {
+  api("/posts").then(posts => {
+    document.getElementById("posts").innerHTML = posts.map(post => `
+      <div class="post">
+        <a href="post.html?id=${post.id}"><b>${post.title}</b></a>
+        <span>by <a href="profile.html?user=${post.author}">${post.author}</a></span>
+        <br><small>${new Date(post.created_at).toLocaleString()}</small>
+      </div>
+    `).join('');
+  });
+}
+function showNewPostBox() {
+  if (!isLoggedIn()) return;
+  document.getElementById("newpost").innerHTML = `
+    <h3>New Post</h3>
+    <form onsubmit="return addPost()">
+      <input id="ptitle" placeholder="Title" required /><br>
+      <textarea id="pcontent" placeholder="Content" required></textarea><br>
+      <button type="submit">Post</button>
+    </form>
+  `;
+}
+window.onload = () => {
+  document.getElementById("authlinks").innerHTML = isLoggedIn() ?
+    `<a href="messages.html">Messages</a> <a href="#" onclick="clearToken();location.reload()">Logout</a>` :
+    `<a href="login.html">Login</a> <a href="signup.html">Sign Up</a>`;
+  showPosts(); showNewPostBox();
+};
+function addPost() {
+  api("/posts", "POST", {title: ptile.value, content: pcontent.value}).then(() => {
+    showPosts();
+    document.getElementById("ptitle").value = "";
+    document.getElementById("pcontent").value = "";
+  });
+  return false;
+}
+</script>
+</body>
+</html>

@@ -1,28 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Profile - Foroom</title>
+  <title>User Profile</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div class="container" id="profile"></div>
+<div class="container">
+  <h2 id="username"></h2>
+  <div id="profile"></div>
+  <a href="index.html">Back to Forum</a>
+</div>
 <script src="js/api.js"></script>
 <script>
-const urlParams = new URLSearchParams(window.location.search);
-const username = urlParams.get('user');
-window.onload = () => {
-  api("/users/"+username).then(u => {
+const params = new URLSearchParams(window.location.search);
+const user = params.get("username");
+
+function renderBadges(badges) {
+  if (!badges || badges.length === 0) return "";
+  return "<b>Badges:</b> " + badges.map(b => `<span class="badge">${b}</span>`).join(" ");
+}
+
+api("/users/" + encodeURIComponent(user))
+  .then(res => {
+    if (res.error) {
+      document.getElementById("profile").innerText = res.error;
+      document.getElementById("username").innerText = "User not found";
+      return;
+    }
+    document.getElementById("username").innerText = res.username;
     document.getElementById("profile").innerHTML = `
-      <h2>${u.username}</h2>
-      <p>Joined: ${new Date(u.join_date).toLocaleDateString()}</p>
-      <p>Last Online: ${new Date(u.last_online).toLocaleString()}</p>
-      <div>
-        Badges: ${(JSON.parse(u.badges||"[]")||[]).map(b => `<span class="profile-badge">${b}</span>`).join(' ')}
-      </div>
-      <a href="messages.html?to=${u.username}">Send Message</a>
+      <div><b>Joined:</b> ${new Date(res.join_date).toLocaleDateString()}</div>
+      <div><b>Last online:</b> ${new Date(res.last_online).toLocaleString()}</div>
+      <div>${renderBadges(JSON.parse(res.badges || "[]"))}</div>
     `;
   });
-};
 </script>
+<style>
+.badge {
+  display: inline-block;
+  background: #eee;
+  border-radius: 5px;
+  padding: 2px 7px;
+  margin: 2px 4px;
+  font-size: 0.9em;
+  border: 1px solid #ccc;
+}
+</style>
 </body>
 </html>

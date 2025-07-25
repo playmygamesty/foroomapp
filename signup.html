@@ -17,7 +17,7 @@
 <script src="js/api.js"></script>
 <script>
 function signup() {
-  api("/api/signup", "POST", {username: username.value, password: password.value})
+  api("/signup", "POST", {username: username.value, password: password.value})
     .then(res => {
       if (res.token) { setToken(res.token); location.href = "index.html"; }
       else document.getElementById("msg").innerText = "Account creation failed";
